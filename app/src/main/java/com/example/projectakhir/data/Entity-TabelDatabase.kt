@@ -1,4 +1,4 @@
-package com.baginda.project_akhir.data
+package com.baginda.projectakhir.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

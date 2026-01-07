@@ -1,5 +1,6 @@
 package com.example.projectakhir
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,17 +18,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.baginda.projectakhir.data.ServisEntity
 import com.example.projectakhir.TampilanUi.*
 import com.example.projectakhir.viewmodel.MyKonterViewModel
-import com.baginda.project_akhir.data.ServisEntity // Pastikan import ini ada untuk tipe data
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.isNotEmpty
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyKonterApp()
+            // Gunakan tema aplikasi Baginda
+            Surface(color = MaterialTheme.colorScheme.background) {
+                MyKonterApp()
+            }
         }
     }
 }
@@ -86,7 +91,7 @@ fun MyKonterApp(viewModel: MyKonterViewModel = viewModel()) {
             composable("progress") {
                 ListPage(
                     jobs = inProgressJobs,
-                    emptyMsg = "Antrian kosong",
+                    emptyMsg = "Antrian servis kosong",
                     actionLabel = "Selesai",
                     onAction = { job: ServisEntity ->
                         viewModel.markAsDone(job)
@@ -95,10 +100,9 @@ fun MyKonterApp(viewModel: MyKonterViewModel = viewModel()) {
                 )
             }
             composable("done") {
-                // Perbaikan: Hapus parameter showAi dan onAiClick
                 ListPage(
                     jobs = doneJobs,
-                    emptyMsg = "Tidak ada HP siap ambil",
+                    emptyMsg = "Belum ada HP yang selesai",
                     actionLabel = "Sudah Diambil",
                     onAction = { job: ServisEntity ->
                         val tgl = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
@@ -112,18 +116,18 @@ fun MyKonterApp(viewModel: MyKonterViewModel = viewModel()) {
                     if (historyJobs.isNotEmpty()) {
                         TextButton(
                             onClick = { viewModel.clearHistory() },
-                            modifier = Modifier.padding(start = 16.dp)
+                            modifier = Modifier.padding(16.dp)
                         ) {
                             Icon(Icons.Default.DeleteSweep, null)
                             Spacer(Modifier.padding(horizontal = 4.dp))
-                            Text("Hapus Semua History")
+                            Text("Hapus Riwayat")
                         }
                     }
                     ListPage(
                         jobs = historyJobs,
-                        emptyMsg = "Belum ada riwayat",
-                        actionLabel = "Arsip",
-                        onAction = { /* Tidak ada aksi di history */ }
+                        emptyMsg = "Belum ada riwayat transaksi",
+                        actionLabel = "Detail",
+                        onAction = { }
                     )
                 }
             }
