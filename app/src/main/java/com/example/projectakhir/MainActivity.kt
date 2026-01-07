@@ -17,10 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.projectakhir.TampilanUi.InputPage
-import com.example.projectakhir.TampilanUi.ListPage
-import com.example.projectakhir.TampilanUi.MyKonterTopBar
+import com.example.projectakhir.TampilanUi.*
 import com.example.projectakhir.viewmodel.MyKonterViewModel
+import com.baginda.project_akhir.data.ServisEntity // Pastikan import ini ada untuk tipe data
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,7 +52,12 @@ fun MyKonterApp(viewModel: MyKonterViewModel = viewModel()) {
                 listOf("input", "progress", "done", "history").forEach { route ->
                     NavigationBarItem(
                         selected = currentRoute == route,
-                        onClick = { navController.navigate(route) },
+                        onClick = {
+                            navController.navigate(route) {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        },
                         label = { Text(route.replaceFirstChar { it.uppercase() }) },
                         icon = {
                             Icon(
@@ -80,46 +84,45 @@ fun MyKonterApp(viewModel: MyKonterViewModel = viewModel()) {
                 }
             }
             composable("progress") {
-                // PERBAIKAN: Tambahkan blok onAction
                 ListPage(
                     jobs = inProgressJobs,
                     emptyMsg = "Antrian kosong",
                     actionLabel = "Selesai",
-                    onAction = { job ->
+                    onAction = { job: ServisEntity ->
                         viewModel.markAsDone(job)
                         navController.navigate("done")
                     }
                 )
             }
             composable("done") {
+                // Perbaikan: Hapus parameter showAi dan onAiClick
                 ListPage(
                     jobs = doneJobs,
                     emptyMsg = "Tidak ada HP siap ambil",
                     actionLabel = "Sudah Diambil",
-                    showAi = true,
-                    onAction = { job ->
+                    onAction = { job: ServisEntity ->
                         val tgl = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
                         viewModel.markAsTaken(job, tgl)
-                    },
-                    onAiClick = { job ->
-                        // Logika Gemini akan ditambahkan nanti
+                        navController.navigate("history")
                     }
                 )
             }
             composable("history") {
                 Column {
                     if (historyJobs.isNotEmpty()) {
-                        TextButton(onClick = { viewModel.clearHistory() }, modifier = Modifier.padding(start = 16.dp)) {
+                        TextButton(
+                            onClick = { viewModel.clearHistory() },
+                            modifier = Modifier.padding(start = 16.dp)
+                        ) {
                             Icon(Icons.Default.DeleteSweep, null)
                             Spacer(Modifier.padding(horizontal = 4.dp))
                             Text("Hapus Semua History")
                         }
                     }
-                    // PERBAIKAN: Tambahkan blok onAction kosong jika tidak ada aksi di history
                     ListPage(
                         jobs = historyJobs,
                         emptyMsg = "Belum ada riwayat",
-                        actionLabel = "Sudah Diambil",
+                        actionLabel = "Arsip",
                         onAction = { /* Tidak ada aksi di history */ }
                     )
                 }
