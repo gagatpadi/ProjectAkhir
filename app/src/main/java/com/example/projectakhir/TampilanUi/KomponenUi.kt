@@ -16,7 +16,7 @@ import com.baginda.project_akhir.data.ServisEntity
 import java.text.NumberFormat
 import java.util.*
 
-// Fungsi utilitas format Rupiah
+// Utilitas Format Rupiah
 fun formatRupiah(amount: Long): String {
     val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
     return format.format(amount)
@@ -71,10 +71,9 @@ fun InputPage(onSave: (String, String, String, Long) -> Unit) {
 }
 
 @Composable
-fun JobCard(job: ServisEntity, actionLabel: String, onAction: () -> Unit, showAi: Boolean = false, onAiClick: () -> Unit = {}) {
+fun JobCard(job: ServisEntity, actionLabel: String, onAction: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // PERBAIKAN: Gunakan horizontalArrangement, bukan justifyContent
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Text(job.tipeHp, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text(formatRupiah(job.harga), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
@@ -84,15 +83,8 @@ fun JobCard(job: ServisEntity, actionLabel: String, onAction: () -> Unit, showAi
             Text("Tgl Masuk: ${job.tglMasuk}", fontSize = 12.sp, color = androidx.compose.ui.graphics.Color.Gray)
 
             Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onAction, modifier = Modifier.weight(1f)) {
-                    Text(actionLabel)
-                }
-                if (showAi) {
-                    FilledTonalButton(onClick = onAiClick) {
-                        Icon(Icons.Default.AutoAwesome, contentDescription = null)
-                    }
-                }
+            Button(onClick = onAction, modifier = Modifier.fillMaxWidth()) {
+                Text(actionLabel)
             }
         }
     }
@@ -103,9 +95,7 @@ fun ListPage(
     jobs: List<ServisEntity>,
     emptyMsg: String,
     actionLabel: String,
-    onAction: (ServisEntity) -> Unit,
-    showAi: Boolean = false,
-    onAiClick: (ServisEntity) -> Unit = {}
+    onAction: (ServisEntity) -> Unit
 ) {
     if (jobs.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -117,9 +107,7 @@ fun ListPage(
                 JobCard(
                     job = job,
                     actionLabel = actionLabel,
-                    onAction = { onAction(job) },
-                    showAi = showAi,
-                    onAiClick = { onAiClick(job) }
+                    onAction = { onAction(job) }
                 )
             }
         }
